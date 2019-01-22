@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_sample"
+            android:title="Sample usage" />
+        <item
+            android:id="@+id/nav_sample_checkbox"
+            android:title="Sample with Checkboxes" />
+        <item
+            android:id="@+id/nav_sample_radio"
+            android:title="Sample with Radiobuttons" />
+        <item
+            android:id="@+id/nav_sample_edittext"
+            android:title="Sample with Edittexts" />
+    </group>
+</menu>

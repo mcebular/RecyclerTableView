@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/RecyclerTableView.HeaderFixedSize" >
+
+    <RadioButton
+        style="@style/RecyclerTableView.ColumnFixedSize"
+        android:layout_width="32dp"
+        android:id="@+id/radioButtonSelected"
+        android:checked="false"
+        android:focusable="false"
+        android:clickable="false" />
+
+    <TextView
+        style="@style/RecyclerTableView.ColumnFixedSize"
+        android:layout_width="36dp"
+        android:text="ID"
+        android:id="@+id/textViewID" />
+
+    <TextView
+        style="@style/RecyclerTableView.ColumnFixedSize"
+        android:layout_width="80dp"
+        android:text="Username"
+        android:id="@+id/textViewUsername" />
+
+    <TextView
+        style="@style/RecyclerTableView.ColumnFixedSize"
+        android:layout_width="120dp"
+        android:text="Name"
+        android:id="@+id/textViewName"
+        android:textStyle="bold" />
+
+    <TextView
+        style="@style/RecyclerTableView.ColumnFixedSize"
+        android:layout_width="120dp"
+        android:text="Surname"
+        android:id="@+id/textViewSurname" />
+
+</LinearLayout>
