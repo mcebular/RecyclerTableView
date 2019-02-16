@@ -60,6 +60,9 @@ public class FragmentSampleEdittext extends Fragment {
         // Set header of the table
         recyclerTableView.setHeaderResource(R.layout.table_row_sample_edittext, R.color.colorPrimary, R.color.colorWhite);
 
+        // Set TableView editable by providing ID of the edittext view
+        recyclerTableView.setEditable(R.id.editTextNote);
+
         // Set LayoutManager
         recyclerTableView.setLayoutManager(new LinearLayoutManager(getContext()));
 
