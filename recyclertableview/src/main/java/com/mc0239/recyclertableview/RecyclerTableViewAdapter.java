@@ -25,10 +25,13 @@ import java.util.ArrayList;
 
 public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTableViewAdapter.ViewHolder> {
     private ArrayList<SparseArray<Object>> rows;
+
     @LayoutRes private int holderViewId;
     @LayoutRes private int[] columnNames;
+
     @IdRes private int checkboxId;
     @IdRes private int edittextId;
+
     boolean multipleCheckable;
 
     public RecyclerTableViewAdapter(@Nullable ArrayList<SparseArray<Object>> rows, @LayoutRes int viewId, @LayoutRes int[] columnNames) {
@@ -50,14 +53,14 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(holderViewId, parent, false);
-        //return new ViewHolder(itemLayoutView, itemLayoutView.getMeasuredWidth(), columnNames);
         return new ViewHolder(itemLayoutView, columnNames, checkboxId, edittextId);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(position%2==1) holder.itemView.setBackgroundColor(Color.parseColor("#E0E0E0"));
         else              holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
 
@@ -71,12 +74,12 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
         }
 
         if(checkboxId != 0) {
-            CompoundButton c = (CompoundButton) holder.itemView.findViewById(checkboxId);
+            CompoundButton c = holder.itemView.findViewById(checkboxId);
             c.setChecked((Boolean) d.get(checkboxId));
         }
 
         if(edittextId != 0) {
-            EditText e = (EditText) holder.itemView.findViewById(edittextId);
+            EditText e = holder.itemView.findViewById(edittextId);
             // reset tint coloring
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) e.setBackgroundTintList(null);
         }
@@ -85,13 +88,23 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
     }
 
     @Override
-    public void onViewRecycled(ViewHolder holder) {
+    public void onViewRecycled(@NonNull ViewHolder holder) {
         if(onRowBindListener != null) onRowBindListener.onRowRecycled(holder.itemView);
     }
 
     @Override
     public int getItemCount() {
         return rows.size();
+    }
+
+    //
+
+    public int getHolderViewId() {
+        return holderViewId;
+    }
+
+    public int getCheckboxId() {
+        return checkboxId;
     }
 
     public ArrayList<SparseArray<Object>> getItems() {
@@ -105,17 +118,20 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                 if ((Boolean) row.get(checkboxId)) c++;
             }
             return c;
-        } else throw new NotCheckableException("This adapter does not have a checkbox view id set.");
+        } else throw new NotCheckableException();
     }
 
     public ArrayList<SparseArray<Object>> getCheckedItems() {
-        ArrayList<SparseArray<Object>> ci = new ArrayList<>();
-        for(SparseArray<Object> row : rows) {
-            if((Boolean) row.get(checkboxId)) {ci.add(row);}
-        }
-        return ci;
+        if(checkboxId != 0) {
+            ArrayList<SparseArray<Object>> ci = new ArrayList<>();
+            for (SparseArray<Object> row : rows) {
+                if ((Boolean) row.get(checkboxId)) {
+                    ci.add(row);
+                }
+            }
+            return ci;
+        } else throw new NotCheckableException();
     }
-
 
     public void removeAllRows() {
         rows.clear();
@@ -177,7 +193,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                 }
             }
             notifyItemRangeChanged(0, rows.size());
-        } else throw new NotCheckableException("This adapter does not have a checkbox view id set.");
+        } else throw new NotCheckableException();
     }
 
     /**
@@ -192,7 +208,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                 row.put(checkboxId, checked);
             }
             notifyDataSetChanged();
-        } else throw new NotCheckableException("This adapter does not have a checkbox view id set.");
+        } else throw new NotCheckableException();
     }
 
     /**
@@ -206,7 +222,11 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                 row.put(edittextId, "");
             }
             notifyDataSetChanged();
-        } else throw new NotEditableException("This adapter does not have an edittext view id set.");
+        } else throw new NotEditableException();
+    }
+
+    public boolean areAllChecked() {
+        return getItemCount() > 0 && getCheckedItemCount() == getItemCount();
     }
 
     public interface OnEditTextListener {
@@ -278,7 +298,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
             });
 
             if(edittextId != 0) {
-                final EditText e = (EditText) itemView.findViewById(edittextId);
+                final EditText e = itemView.findViewById(edittextId);
                 e.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View view, boolean hasFocus) {

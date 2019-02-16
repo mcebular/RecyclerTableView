@@ -56,15 +56,6 @@ public class FragmentSampleCheckbox extends Fragment {
         // Get RecyclerTableView view
         recyclerTableView = view.findViewById(R.id.recyclerTableView1);
 
-        // Set header of the table
-        recyclerTableView.setHeaderResource(R.layout.table_row_sample_checkbox, R.color.colorPrimary, R.color.colorWhite);
-
-        // Set TableView checkable by providing ID of the checkbox view
-        recyclerTableView.setCheckable(R.id.checkBoxSelected);
-
-        // Set LayoutManager
-        recyclerTableView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         // Set adapter to RecyclerTableView
         recyclerTableView.setAdapter(recyclerTableViewAdapter);
 
