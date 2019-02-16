@@ -1,9 +1,7 @@
 package com.mc0239.recyclertableview.exception;
 
 public class NotCheckableException extends RuntimeException {
-    public NotCheckableException() {}
-
-    public NotCheckableException(String message) {
-        super(message);
+    public NotCheckableException() {
+        super("This adapter does not have a checkbox view id set.");
     }
 }
