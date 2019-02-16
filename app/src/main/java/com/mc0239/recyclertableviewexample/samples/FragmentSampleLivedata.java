@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.mc0239.recyclertableviewexample.R;
 import com.mc0239.recyclertableviewexample.database.AppDatabase;
 import com.mc0239.recyclertableviewexample.database.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentSampleLivedata extends Fragment {
@@ -27,15 +25,7 @@ public class FragmentSampleLivedata extends Fragment {
     public FragmentSampleLivedata() {
 
         // Create a new RecyclerTableViewAdapter
-        recyclerTableViewAdapter = new RecyclerTableViewAdapter(
-                null,
-                R.layout.table_row_sample_usage,
-                new int[]{
-                        R.id.textViewID,
-                        R.id.textViewUsername,
-                        R.id.textViewName,
-                        R.id.textViewSurname
-                });
+        recyclerTableViewAdapter = new RecyclerTableViewAdapter(User.class, null);
     }
 
     @Nullable
@@ -54,17 +44,7 @@ public class FragmentSampleLivedata extends Fragment {
             @Override
             public void onChanged(@Nullable List<User> users) {
                 if (users == null) return;
-
-                ArrayList<SparseArray<Object>> data = new ArrayList<>();
-                for(User u : users) {
-                    SparseArray<Object> s = new SparseArray<>();
-                    s.put(R.id.textViewID, u.id);
-                    s.put(R.id.textViewUsername, u.username);
-                    s.put(R.id.textViewName, u.name);
-                    s.put(R.id.textViewSurname, u.surname);
-                    data.add(s);
-                }
-                recyclerTableViewAdapter.setRows(data);
+                recyclerTableViewAdapter.setItems(users);
             }
         });
 

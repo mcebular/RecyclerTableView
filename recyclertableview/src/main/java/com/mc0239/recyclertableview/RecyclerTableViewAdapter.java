@@ -1,15 +1,14 @@
 package com.mc0239.recyclertableview;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,45 +17,66 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.mc0239.recyclertableview.annotation.RecyclerTableColumn;
+import com.mc0239.recyclertableview.annotation.RecyclerTableRow;
 import com.mc0239.recyclertableview.exception.NotCheckableException;
 import com.mc0239.recyclertableview.exception.NotEditableException;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@SuppressLint("UseSparseArrays")
 public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTableViewAdapter.ViewHolder> {
-    private ArrayList<SparseArray<Object>> rows;
 
-    @LayoutRes private int holderViewId;
-    @LayoutRes private int[] columnNames;
+    private List<?> items;
+    private HashMap<Integer, Field> rowFieldMap;
 
+    @LayoutRes private int rowHeaderViewId;
     @IdRes private int checkboxId;
     @IdRes private int edittextId;
 
     boolean multipleCheckable;
 
-    public RecyclerTableViewAdapter(@Nullable ArrayList<SparseArray<Object>> rows, @LayoutRes int viewId, @LayoutRes int[] columnNames) {
-        this(rows, viewId, columnNames, 0, 0);
+    public RecyclerTableViewAdapter(Class rowClass, List<?> items) {
+        // get header resource layout
+        if (!rowClass.isAnnotationPresent(RecyclerTableRow.class)) {
+            throw new RuntimeException("Class not annotated with RecyclerTableRow");
+        } else {
+            RecyclerTableRow antRow = (RecyclerTableRow) rowClass.getAnnotation(RecyclerTableRow.class);
+            rowHeaderViewId = antRow.value();
+            checkboxId = antRow.checkboxViewId();
+            edittextId = antRow.edittextViewId();
+        }
+
+        // get column names (view IDs) and corresponding field names
+        rowFieldMap = new HashMap<>();
+        for (Field f : rowClass.getDeclaredFields()) {
+            if (f.isAnnotationPresent(RecyclerTableColumn.class)) {
+                RecyclerTableColumn antColumn = f.getAnnotation(RecyclerTableColumn.class);
+                int val = antColumn.value();
+                if (val != 0) {
+                    rowFieldMap.put(val, f);
+                }
+            }
+        }
+
+        if (items != null) {
+            this.items = items;
+        } else {
+            this.items = new ArrayList<>();
+        }
     }
 
-    public RecyclerTableViewAdapter(@Nullable ArrayList<SparseArray<Object>> rows, @LayoutRes int viewId, @LayoutRes int[] columnNames, @IdRes int checkboxViewId) {
-        this(rows, viewId, columnNames, checkboxViewId, 0);
-    }
-
-    public RecyclerTableViewAdapter(ArrayList<SparseArray<Object>> rows, @LayoutRes int viewId, @LayoutRes int[] columnNames, @IdRes int checkboxViewId, @IdRes int edittextViewId) {
-        this.rows = rows;
-        if(this.rows == null) this.rows = new ArrayList<>();
-        this.holderViewId = viewId;
-        this.columnNames = columnNames;
-        this.checkboxId = checkboxViewId;
-        multipleCheckable = true;
-        this.edittextId = edittextViewId;
-    }
+    //
 
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(holderViewId, parent, false);
-        return new ViewHolder(itemLayoutView, columnNames, checkboxId, edittextId);
+        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(rowHeaderViewId, parent, false);
+        return new ViewHolder(itemLayoutView);
     }
 
     @Override
@@ -64,18 +84,20 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
         if(position%2==1) holder.itemView.setBackgroundColor(Color.parseColor("#E0E0E0"));
         else              holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
 
-        SparseArray<Object> d = rows.get(position);
+        Object row = items.get(position);
 
-        for(int i=0; i<holder.cols.size(); i++) {
-            View v = holder.cols.get(i);
+        for(Map.Entry<Integer, Field> entry : rowFieldMap.entrySet()) {
+            View v = holder.itemView.findViewById(entry.getKey());
+
             if(v instanceof TextView && !(v instanceof CompoundButton)) {
-                ((TextView) v).setText(String.valueOf(d.get(v.getId())));
+
+                ((TextView) v).setText(String.valueOf(getFieldValue(entry.getValue(), row)));
             }
         }
 
         if(checkboxId != 0) {
             CompoundButton c = holder.itemView.findViewById(checkboxId);
-            c.setChecked((Boolean) d.get(checkboxId));
+            c.setChecked((Boolean) getFieldValue(rowFieldMap.get(checkboxId), row));
         }
 
         if(edittextId != 0) {
@@ -84,7 +106,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) e.setBackgroundTintList(null);
         }
 
-        if(onRowBindListener != null) onRowBindListener.onRowBound(holder.itemView, rows.get(position), position);
+        if(onRowBindListener != null) onRowBindListener.onRowBound(holder.itemView, items.get(position), position);
     }
 
     @Override
@@ -94,38 +116,62 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
     @Override
     public int getItemCount() {
-        return rows.size();
+        return items.size();
     }
 
     //
 
-    public int getHolderViewId() {
-        return holderViewId;
+    private Object getFieldValue(Field f, Object o) {
+        Object value = null;
+        try {
+            value = f.get(o);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
+    private void setFieldValue(Field f, Object o, Object v) {
+        try {
+            f.set(o, v);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //
+
+    public int getRowHeaderViewId() {
+        return rowHeaderViewId;
     }
 
     public int getCheckboxId() {
         return checkboxId;
     }
 
-    public ArrayList<SparseArray<Object>> getItems() {
-        return rows;
+    public int getEdittextId() {
+        return edittextId;
+    }
+
+    public List<?> getItems() {
+        return items;
     }
 
     public int getCheckedItemCount() {
         if(checkboxId != 0) {
             int c = 0;
-            for (SparseArray<Object> row : rows) {
-                if ((Boolean) row.get(checkboxId)) c++;
+            for (Object row : items) {
+                if ((Boolean) getFieldValue(rowFieldMap.get(checkboxId), row)) c++;
             }
             return c;
         } else throw new NotCheckableException();
     }
 
-    public ArrayList<SparseArray<Object>> getCheckedItems() {
+    public List<Object> getCheckedItems() {
         if(checkboxId != 0) {
-            ArrayList<SparseArray<Object>> ci = new ArrayList<>();
-            for (SparseArray<Object> row : rows) {
-                if ((Boolean) row.get(checkboxId)) {
+            ArrayList<Object> ci = new ArrayList<>();
+            for (Object row : items) {
+                if ((Boolean) getFieldValue(rowFieldMap.get(checkboxId), row)) {
                     ci.add(row);
                 }
             }
@@ -133,28 +179,22 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
         } else throw new NotCheckableException();
     }
 
-    public void removeAllRows() {
-        rows.clear();
+    //
+
+    public void clearItems() {
+        items.clear();
         notifyDataSetChanged();
     }
 
-    /**
-     * Adds a row to this adapter and updates the RecyclerTableView.
-     * @param row SparseArray with columns that <b>must</b> match columns in defined row view
-     *            (exception here is the CheckBox column, which defaults to false).
-     */
-    public void addRow(SparseArray<Object> row) {
+    public void addItem(Object item) {
         // if it's checkable and no value for checkbox state is provided, default to false
-        if(checkboxId != 0 && row.get(checkboxId) == null) row.put(checkboxId, false);
-        rows.add(row);
+        //if(checkboxId != 0 && row.get(checkboxId) == null) row.put(checkboxId, false);
+        // items.add(item); TODO
         notifyDataSetChanged();
     }
 
-    public void setRows(ArrayList<SparseArray<Object>> rows) {
-        for (SparseArray<Object> row : rows) {
-            if(checkboxId != 0 && row.get(checkboxId) == null) row.put(checkboxId, false);
-        }
-        this.rows = rows;
+    public void setItems(List<?> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
@@ -176,25 +216,26 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
      * was not called upon RecyclerTableView).
      * @param filter SparseArray that is compared to each row
      * @param checked new state of CheckBoxes
+     *                TODO
      */
-    public void setChecked(@NonNull SparseArray<Object> filter, boolean checked) {
+    /*public void setChecked(@NonNull SparseArray<Object> filter, boolean checked) {
         if(checkboxId != 0) {
             for (int i = 0; i < rows.size(); i++) {
-                SparseArray<Object> row = rows.get(i);
+                RecyclerTableRow row = rows.get(i);
                 int fits = 0;
                 for (int j = 0; j < filter.size(); j++) {
                     int key = filter.keyAt(j);
                     String c1 = String.valueOf(filter.get(key));
-                    String c2 = String.valueOf(row.get(key));
-                    if (c1.equals(c2)) fits++;
+                    // String c2 = String.valueOf(row.get(key)); TODO
+                    // if (c1.equals(c2)) fits++;
                 }
                 if (fits == filter.size()) {
-                    rows.get(i).put(checkboxId, checked);
+                    setFieldValue(rowFieldMap.get(checkboxId), rows.get(i), checked);
                 }
             }
             notifyItemRangeChanged(0, rows.size());
         } else throw new NotCheckableException();
-    }
+    }*/
 
     /**
      * Sets all CheckBox fields in this adapter to given state and updates the RecyclerTableView.
@@ -204,8 +245,8 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
      */
     public void setAllChecked(boolean checked) {
         if(checkboxId != 0) {
-            for(SparseArray<Object> row: rows) {
-                row.put(checkboxId, checked);
+            for(Object row: items) {
+                setFieldValue(rowFieldMap.get(checkboxId), row, checked);
             }
             notifyDataSetChanged();
         } else throw new NotCheckableException();
@@ -216,10 +257,10 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
      * @exception NotEditableException Adapter does not have an EditText view ID set (setEditable
      * was not called upon RecyclerTableView).
      */
-    public void clearAllEditables() {
+    public void clearAllEdittexts() {
         if(edittextId != 0) {
-            for(SparseArray<Object> row: rows) {
-                row.put(edittextId, "");
+            for(Object row: items) {
+                setFieldValue(rowFieldMap.get(edittextId), row, "");
             }
             notifyDataSetChanged();
         } else throw new NotEditableException();
@@ -229,24 +270,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
         return getItemCount() > 0 && getCheckedItemCount() == getItemCount();
     }
 
-    public interface OnEditTextListener {
-        void onEditTextFocus(EditText editText, SparseArray<Object> rowData);
-        void onEditTextChanged(EditText editText, String text);
-        boolean onEnterPressed(EditText editText, SparseArray<Object> rowData);
-    }
-
-    public interface OnRowClickListener {
-        void onRowClicked(View rowView, SparseArray<Object> rowData, int position);
-    }
-
-    public interface OnRowLongClickListener {
-        boolean onLongClicked(View rowView, SparseArray<Object> rowData, int position);
-    }
-
-    public interface OnRowBindListener {
-        void onRowBound(View rowView, SparseArray<Object> rowData, int position);
-        void onRowRecycled(View rowView);
-    }
+    //
 
     private OnEditTextListener onEditTextListener = null;
     private OnRowClickListener onRowClickListener = null;
@@ -258,16 +282,12 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
     public void setOnRowLongClickListener(OnRowLongClickListener l) { onRowLongClickListener = l; }
     public void setOnRowBindListener(OnRowBindListener l) { onRowBindListener = l; }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    //
 
-        public ArrayList<View> cols;
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(View itemView, @LayoutRes int[] columnNames, @IdRes final int checkboxId, @IdRes final int edittextId) {
+        public ViewHolder(View itemView) {
             super(itemView);
-            cols = new ArrayList<>(columnNames.length);
-            for (int columnName : columnNames) {
-                cols.add(itemView.findViewById(columnName));
-            }
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -275,16 +295,16 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                     int position = getAdapterPosition();
                     if(checkboxId != 0) {
                         if(multipleCheckable) {
-                            boolean checked = (boolean) rows.get(position).get(checkboxId);
-                            rows.get(position).put(checkboxId, !checked);
+                            boolean checked = (boolean) getFieldValue(rowFieldMap.get(checkboxId), items.get(position));
+                            setFieldValue(rowFieldMap.get(checkboxId), items.get(position), !checked);
                             notifyItemChanged(position);
                         } else {
                             setAllChecked(false);
-                            rows.get(position).put(checkboxId, true);
-                            notifyItemRangeChanged(0, rows.size());
+                            setFieldValue(rowFieldMap.get(checkboxId), items.get(position), true);
+                            notifyItemRangeChanged(0, items.size());
                         }
                     }
-                    if(onRowClickListener != null) onRowClickListener.onRowClicked(v, rows.get(position), position);
+                    if(onRowClickListener != null) onRowClickListener.onRowClicked(v, items.get(position), position);
                 }
             });
 
@@ -292,7 +312,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                 @Override
                 public boolean onLongClick(View v) {
                     int position = getAdapterPosition();
-                    if(onRowLongClickListener != null) return onRowLongClickListener.onLongClicked(v, rows.get(position), position);
+                    if(onRowLongClickListener != null) return onRowLongClickListener.onLongClicked(v, items.get(position), position);
                     return false;
                 }
             });
@@ -306,7 +326,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                             int position = getAdapterPosition();
                             if(position >= 0)
                                 if (onEditTextListener != null)
-                                    onEditTextListener.onEditTextFocus((EditText) view, rows.get(position));
+                                    onEditTextListener.onEditTextFocus((EditText) view, items.get(position));
                         }
                     }
                 });
@@ -315,7 +335,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                     @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        rows.get(getAdapterPosition()).put(edittextId, editable.toString());
+                        setFieldValue(rowFieldMap.get(edittextId), items.get(getAdapterPosition()), editable.toString());
                         if(onEditTextListener != null) onEditTextListener.onEditTextChanged(e, editable.toString());
                     }
                 });
@@ -324,7 +344,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                     public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
                         if (keyCode == KeyEvent.KEYCODE_ENTER) {
                             if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
-                                if(onEditTextListener != null) return onEditTextListener.onEnterPressed((EditText) view, rows.get(getAdapterPosition()));
+                                if(onEditTextListener != null) return onEditTextListener.onEnterPressed((EditText) view, items.get(getAdapterPosition()));
                             }
                         }
                         return false;

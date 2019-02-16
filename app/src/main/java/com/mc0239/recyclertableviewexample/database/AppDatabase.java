@@ -8,7 +8,7 @@ import android.content.Context;
 import java.util.ArrayList;
 
 
-@Database(entities = {User.class}, version = 1)
+@Database(entities = {User.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
