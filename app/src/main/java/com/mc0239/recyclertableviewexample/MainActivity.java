@@ -13,8 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.mc0239.recyclertableviewexample.database.AppDatabase;
 import com.mc0239.recyclertableviewexample.samples.FragmentSampleCheckbox;
 import com.mc0239.recyclertableviewexample.samples.FragmentSampleEdittext;
+import com.mc0239.recyclertableviewexample.samples.FragmentSampleLivedata;
 import com.mc0239.recyclertableviewexample.samples.FragmentSampleRadiobutton;
 import com.mc0239.recyclertableviewexample.samples.FragmentSampleUsage;
 
@@ -26,7 +28,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentSampleUsage,
             fragmentSampleCheckbox,
             fragmentSampleRadiobutton,
-            fragmentSampleEdittext;
+            fragmentSampleEdittext,
+            fragmentSampleLiveData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentSampleCheckbox = new FragmentSampleCheckbox();
         fragmentSampleRadiobutton = new FragmentSampleRadiobutton();
         fragmentSampleEdittext = new FragmentSampleEdittext();
+        fragmentSampleLiveData = new FragmentSampleLivedata();
+
+        AppDatabase.getDatabase(this).generateSampleData();
     }
 
     @Override
@@ -79,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             transaction.replace(R.id.fragment_frame, fragmentSampleRadiobutton);
         } else if (mid == R.id.nav_sample_edittext) {
             transaction.replace(R.id.fragment_frame, fragmentSampleEdittext);
+        } else if (mid == R.id.nav_sample_livedata) {
+            transaction.replace(R.id.fragment_frame, fragmentSampleLiveData);
         } else {
             Log.w(getClass().getSimpleName(), "Navigation menu selection not handled.");
         }
