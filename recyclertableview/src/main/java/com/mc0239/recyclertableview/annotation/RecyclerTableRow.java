@@ -11,6 +11,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RecyclerTableRow {
+    /**
+     * @return Layout resource for the row
+     */
     @LayoutRes int value();
     @IdRes int checkboxViewId() default 0;
     @IdRes int edittextViewId() default 0;

@@ -44,10 +44,29 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
     boolean multipleCheckable;
 
+    /**
+     * Create a new adapter that gets row layout and column view ids from given class, which should
+     * be properly annotated with {@link RecyclerTableRow} and given class fields annotated with
+     * {@link RecyclerTableColumn}.
+     * @param rowClass Class to use as table row data
+     * @param items List of rows of type class
+     */
     public RecyclerTableViewAdapter(Class rowClass, List<?> items) {
         this(rowClass, items, 0, 0, 0);
     }
 
+    /**
+     * Create a new adapter with explicitly given row layout. If rowLayout is not 0, annotation
+     * {@link RecyclerTableRow} is ignored and parameters <i>rowLayout</i>, <i>checkboxId</i> and
+     * <i>edittextId</i> are used instead.
+     * Class is not required to be annotated with {@link RecyclerTableRow}, however, fields should
+     * still be annotated with {@link RecyclerTableColumn}.
+     * @param rowClass Class to use as table row data
+     * @param items List of rows of type class
+     * @param rowLayout Layout of the row to use
+     * @param checkboxId Id of the checkbox (or radiobutton) view in rowLayout
+     * @param edittextId Id of the edittext view in rowLayout
+     */
     public RecyclerTableViewAdapter(Class rowClass, List<?> items, @LayoutRes int rowLayout, @IdRes int checkboxId, @IdRes int edittextId) {
         // get header resource layout
         // 1. from constructor arguments, if specified

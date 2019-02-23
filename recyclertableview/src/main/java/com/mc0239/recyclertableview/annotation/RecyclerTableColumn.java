@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface RecyclerTableColumn {
+    /**
+     * @return View ID the field should be mapped to.
+     */
     @IdRes int value();
 }

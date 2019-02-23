@@ -28,6 +28,9 @@ public class User {
     @RecyclerTableColumn(R.id.editTextNote)
     public String note;
 
+    /*
+     * You can define *InView() method for a field to override the field's default string value.
+     */
     public String surnameInView() {
         return surname + " " + id;
     }
