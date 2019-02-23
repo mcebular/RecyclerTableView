@@ -34,21 +34,33 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
     private List<?> items;
     private HashMap<Integer, Field> rowFieldMap;
 
-    @LayoutRes private int rowHeaderViewId;
+    @LayoutRes private int rowLayout;
     @IdRes private int checkboxId;
     @IdRes private int edittextId;
 
     boolean multipleCheckable;
 
     public RecyclerTableViewAdapter(Class rowClass, List<?> items) {
+        this(rowClass, items, 0, 0, 0);
+    }
+
+    public RecyclerTableViewAdapter(Class rowClass, List<?> items, @LayoutRes int rowLayout, @IdRes int checkboxId, @IdRes int edittextId) {
         // get header resource layout
-        if (!rowClass.isAnnotationPresent(RecyclerTableRow.class)) {
-            throw new RuntimeException("Class not annotated with RecyclerTableRow");
+        // 1. from constructor arguments, if specified
+        // 2. from annotation of the passed class
+        if (rowLayout != 0) {
+            this.rowLayout = rowLayout;
+            this.checkboxId = checkboxId;
+            this.edittextId = edittextId;
         } else {
-            RecyclerTableRow antRow = (RecyclerTableRow) rowClass.getAnnotation(RecyclerTableRow.class);
-            rowHeaderViewId = antRow.value();
-            checkboxId = antRow.checkboxViewId();
-            edittextId = antRow.edittextViewId();
+            if (!rowClass.isAnnotationPresent(RecyclerTableRow.class)) {
+                throw new RuntimeException("Class not annotated with RecyclerTableRow and no rowLayout specified");
+            } else {
+                RecyclerTableRow antRow = (RecyclerTableRow) rowClass.getAnnotation(RecyclerTableRow.class);
+                this.rowLayout = antRow.value();
+                this.checkboxId = antRow.checkboxViewId();
+                this.edittextId = antRow.edittextViewId();
+            }
         }
 
         // get column names (view IDs) and corresponding field names
@@ -75,7 +87,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(rowHeaderViewId, parent, false);
+        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(rowLayout, parent, false);
         return new ViewHolder(itemLayoutView);
     }
 
@@ -89,9 +101,11 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
         for(Map.Entry<Integer, Field> entry : rowFieldMap.entrySet()) {
             View v = holder.itemView.findViewById(entry.getKey());
 
-            if(v instanceof TextView && !(v instanceof CompoundButton)) {
+            if(v != null) {
+                if (v instanceof TextView && !(v instanceof CompoundButton)) {
 
-                ((TextView) v).setText(String.valueOf(getFieldValue(entry.getValue(), row)));
+                    ((TextView) v).setText(String.valueOf(getFieldValue(entry.getValue(), row)));
+                }
             }
         }
 
@@ -141,8 +155,8 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
     //
 
-    public int getRowHeaderViewId() {
-        return rowHeaderViewId;
+    public int getRowLayout() {
+        return rowLayout;
     }
 
     public int getCheckboxId() {

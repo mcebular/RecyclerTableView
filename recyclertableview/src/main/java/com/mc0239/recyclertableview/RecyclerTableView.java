@@ -119,7 +119,7 @@ public class RecyclerTableView extends FrameLayout {
 
         this.checkboxViewId = adapter.getCheckboxId();
 
-        setHeaderResource(adapter.getRowHeaderViewId(), R.color.colorPrimary, R.color.colorWhite);
+        setHeaderResource(adapter.getRowLayout(), R.color.colorPrimary, R.color.colorWhite);
 
         viewAdapter = adapter;
         viewAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
