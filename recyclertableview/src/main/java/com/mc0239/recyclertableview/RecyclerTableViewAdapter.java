@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.mc0239.recyclertableview.exception.NotCheckableException;
 import com.mc0239.recyclertableview.exception.NotEditableException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +36,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
     private List<?> items;
     private HashMap<Integer, Field> rowFieldMap;
+    private HashMap<Field, Method> fieldDisplayMap;
 
     @LayoutRes private int rowLayout;
     @IdRes private int checkboxId;
@@ -65,6 +69,7 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
         // get column names (view IDs) and corresponding field names
         rowFieldMap = new HashMap<>();
+        fieldDisplayMap = new HashMap<>();
         for (Field f : rowClass.getDeclaredFields()) {
             if (f.isAnnotationPresent(RecyclerTableColumn.class)) {
                 RecyclerTableColumn antColumn = f.getAnnotation(RecyclerTableColumn.class);
@@ -73,6 +78,12 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
                     rowFieldMap.put(val, f);
                 }
             }
+
+            // get mapper if exists
+            try {
+                Method m = rowClass.getDeclaredMethod(f.getName() + "InView");
+                fieldDisplayMap.put(f, m);
+            } catch (NoSuchMethodException ignored) { }
         }
 
         if (items != null) {
@@ -103,8 +114,19 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
 
             if(v != null) {
                 if (v instanceof TextView && !(v instanceof CompoundButton)) {
+                    String value = null;
+                    Method mapper = fieldDisplayMap.get(entry.getValue());
+                    if (mapper != null) {
+                        try {
+                            value = (String) mapper.invoke(row);
+                        } catch (IllegalAccessException ignored) { }
+                        catch (InvocationTargetException ignored) { }
+                    }
 
-                    ((TextView) v).setText(String.valueOf(getFieldValue(entry.getValue(), row)));
+                    if (value == null) {
+                        value = String.valueOf(getFieldValue(entry.getValue(), row));
+                    }
+                    ((TextView) v).setText(value);
                 }
             }
         }
@@ -141,6 +163,9 @@ public class RecyclerTableViewAdapter extends RecyclerView.Adapter<RecyclerTable
             value = f.get(o);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            Log.e(getClass().getSimpleName(), "Field " + f + " does not exist in field map. Is there a view id without assigned field?\n" +
+                    "Possible cause is missing field for checkboxId or edittextId.", e);
         }
         return value;
     }

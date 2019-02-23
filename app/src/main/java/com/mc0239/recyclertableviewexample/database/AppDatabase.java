@@ -8,7 +8,7 @@ import android.content.Context;
 import java.util.ArrayList;
 
 
-@Database(entities = {User.class}, version = 2)
+@Database(entities = {User.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -40,7 +40,7 @@ public abstract class AppDatabase extends RoomDatabase {
             u.id = i;
             u.username = "johnd";
             u.name = "John";
-            u.surname = "Doe ";
+            u.surname = "Doe";
 
             users.add(u);
         }

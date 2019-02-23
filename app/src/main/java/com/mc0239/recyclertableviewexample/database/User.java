@@ -1,6 +1,7 @@
 package com.mc0239.recyclertableviewexample.database;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.mc0239.recyclertableview.annotation.RecyclerTableColumn;
@@ -10,9 +11,6 @@ import com.mc0239.recyclertableviewexample.R;
 @Entity
 @RecyclerTableRow(value = R.layout.table_row_sample_usage)
 public class User {
-
-    @RecyclerTableColumn(value = R.id.checkBoxSelected)
-    public boolean checked;
 
     @PrimaryKey
     @RecyclerTableColumn(R.id.textViewID)
@@ -29,5 +27,9 @@ public class User {
 
     @RecyclerTableColumn(R.id.editTextNote)
     public String note;
+
+    public String surnameInView() {
+        return surname + " " + id;
+    }
 
 }

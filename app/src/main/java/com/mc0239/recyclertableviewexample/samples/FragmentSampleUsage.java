@@ -28,7 +28,7 @@ public class FragmentSampleUsage extends Fragment {
             u.id = i;
             u.username = "johnd";
             u.name = "John";
-            u.surname = "Doe " + i;
+            u.surname = "Doe";
             users.add(u);
         }
 
