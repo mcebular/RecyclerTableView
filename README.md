@@ -2,6 +2,8 @@
 
 [![](https://jitpack.io/v/mc0239/RecyclerTableView.svg)](https://jitpack.io/#mc0239/RecyclerTableView)
 
+![Sample screenshots](https://raw.githubusercontent.com/mc0239/RecyclerTableView/2.x/screenshot.jpg)
+
 RecyclerTableView allows you to have table-like RecyclerView. Due to how view recycling works, it is
 difficult to know how wide the rows should be, therefore requiring usage of fixed width row layouts.
 
