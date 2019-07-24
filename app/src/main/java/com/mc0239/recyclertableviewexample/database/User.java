@@ -1,8 +1,7 @@
 package com.mc0239.recyclertableviewexample.database;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.mc0239.recyclertableview.annotation.RecyclerTableColumn;
 import com.mc0239.recyclertableview.annotation.RecyclerTableRow;
