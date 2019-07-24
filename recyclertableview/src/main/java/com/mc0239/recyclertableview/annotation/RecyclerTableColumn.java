@@ -1,6 +1,6 @@
 package com.mc0239.recyclertableview.annotation;
 
-import android.support.annotation.IdRes;
+import androidx.annotation.IdRes;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -3,10 +3,6 @@ package com.mc0239.recyclertableview;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,6 +13,11 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mc0239.recyclertableview.annotation.RecyclerTableColumn;
 import com.mc0239.recyclertableview.annotation.RecyclerTableRow;
