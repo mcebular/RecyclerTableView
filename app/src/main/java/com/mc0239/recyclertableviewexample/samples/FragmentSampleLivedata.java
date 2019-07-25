@@ -21,12 +21,12 @@ import java.util.List;
 public class FragmentSampleLivedata extends Fragment {
 
     private RecyclerTableView recyclerTableView;
-    private RecyclerTableViewAdapter recyclerTableViewAdapter;
+    private RecyclerTableViewAdapter<User> recyclerTableViewAdapter;
 
     public FragmentSampleLivedata() {
 
         // Create a new RecyclerTableViewAdapter
-        recyclerTableViewAdapter = new RecyclerTableViewAdapter(User.class, null);
+        recyclerTableViewAdapter = new RecyclerTableViewAdapter<>(User.class, null);
     }
 
     @Nullable

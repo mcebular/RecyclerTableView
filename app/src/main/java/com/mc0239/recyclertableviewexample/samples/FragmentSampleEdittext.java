@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class FragmentSampleEdittext extends Fragment {
 
     private RecyclerTableView recyclerTableView;
-    private RecyclerTableViewAdapter recyclerTableViewAdapter;
+    private RecyclerTableViewAdapter<UserEditable> recyclerTableViewAdapter;
 
     public FragmentSampleEdittext() {
         // Prepare some data for the table
@@ -35,7 +35,7 @@ public class FragmentSampleEdittext extends Fragment {
         }
 
         // Create a new RecyclerTableViewAdapter
-        recyclerTableViewAdapter = new RecyclerTableViewAdapter(UserEditable.class, users);
+        recyclerTableViewAdapter = new RecyclerTableViewAdapter<>(UserEditable.class, users);
     }
 
     @Nullable

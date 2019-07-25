@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class FragmentSampleRadiobutton extends Fragment {
 
     private RecyclerTableView recyclerTableView;
-    private RecyclerTableViewAdapter recyclerTableViewAdapter;
+    private RecyclerTableViewAdapter<UserCheckableSingle> recyclerTableViewAdapter;
 
     public FragmentSampleRadiobutton() {
         // Prepare some data for the table
@@ -35,7 +35,7 @@ public class FragmentSampleRadiobutton extends Fragment {
         }
 
         // Create a new RecyclerTableViewAdapter
-        recyclerTableViewAdapter = new RecyclerTableViewAdapter(UserCheckableSingle.class, users);
+        recyclerTableViewAdapter = new RecyclerTableViewAdapter<>(UserCheckableSingle.class, users);
     }
 
     @Nullable

@@ -136,7 +136,7 @@ public class RecyclerTableView extends FrameLayout {
             private void checkHeader() {
                 if(checkboxViewId != 0) {
                     CompoundButton c = headerRow.findViewById(checkboxViewId);
-                    c.setChecked(viewAdapter.areAllChecked());
+                    c.setChecked(viewAdapter.areAllItemsChecked());
                 }
             }
         });
@@ -173,8 +173,8 @@ public class RecyclerTableView extends FrameLayout {
                 if(checkboxViewId != 0) {
                     CompoundButton c = headerRow.findViewById(checkboxViewId);
                     if(c instanceof CheckBox) {
-                        boolean allChecked = viewAdapter.areAllChecked();
-                        viewAdapter.setAllChecked(!allChecked);
+                        boolean allChecked = viewAdapter.areAllItemsChecked();
+                        viewAdapter.setAllItemsChecked(!allChecked);
                         c.setChecked(!allChecked);
                     }
                 }

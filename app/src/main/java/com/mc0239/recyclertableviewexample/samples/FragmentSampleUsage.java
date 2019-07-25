@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class FragmentSampleUsage extends Fragment {
 
     private RecyclerTableView recyclerTableView;
-    private RecyclerTableViewAdapter recyclerTableViewAdapter;
+    private RecyclerTableViewAdapter<User> recyclerTableViewAdapter;
 
     public FragmentSampleUsage() {
         // Prepare some data for the table
@@ -34,7 +34,7 @@ public class FragmentSampleUsage extends Fragment {
         }
 
         // Create a new RecyclerTableViewAdapter
-        recyclerTableViewAdapter = new RecyclerTableViewAdapter(User.class, users);
+        recyclerTableViewAdapter = new RecyclerTableViewAdapter<>(User.class, users);
     }
 
     @Nullable
