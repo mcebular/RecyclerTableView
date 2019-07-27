@@ -7,7 +7,7 @@ import java.util.Random;
 public class SampleUserGenerator {
 
 private static final String[]
-        names = {"Ellis", "Trevor", "Hillary", "Julianna", "Ebba", "Darin", "Meredith", "Shelly", "Angelica", "Nelson"},
+        names = {"Ellie", "Trevor", "Hilly", "Julie", "Ebba", "Darin", "Mary", "Shelly", "Angie", "Nelson"},
         surnames = {"Sniders", "Danielson", "Romilly", "Durand", "Vipond", "Wakefield", "Wilson"};
 
     public static UserCheckable generateUser() {
@@ -17,7 +17,7 @@ private static final String[]
         u.name = names[r.nextInt(names.length)];
         u.surname = surnames[r.nextInt(surnames.length)];
         u.username = u.name.substring(3) + u.surname.substring(3);
-        u.checked = r.nextInt(100) > 10;
+        u.checked = r.nextInt(100) < 10;
         return u;
     }
 }

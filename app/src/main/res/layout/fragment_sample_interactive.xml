@@ -31,6 +31,12 @@
             android:layout_weight="1"
             android:text="Add at 5" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <Button
             android:id="@+id/buttonAddMore"
             android:layout_width="0dp"
@@ -65,6 +71,12 @@
             android:layout_weight="1"
             android:text="Remove at 5" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <Button
             android:id="@+id/buttonRemoveMore"
             android:layout_width="0dp"
@@ -78,6 +90,26 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Remove all" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/buttonRemoveChecked"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Remove checked" />
+
+        <Button
+            android:id="@+id/buttonCheckEllies"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Check Ellies" />
 
     </LinearLayout>
 

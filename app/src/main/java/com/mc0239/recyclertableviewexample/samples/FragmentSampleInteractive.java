@@ -35,7 +35,8 @@ public class FragmentSampleInteractive extends Fragment {
     public FragmentSampleInteractive() {
         // Prepare some data for the table
         ArrayList<UserCheckable> users = new ArrayList<>();
-        for(int i = 0; i < 10; i++) {
+        // Stress-test: generate 10 000 entries!!
+        for(int i = 0; i < 10_000; i++) {
             UserCheckable u = SampleUserGenerator.generateUser();
             users.add(u);
         }
@@ -123,6 +124,25 @@ public class FragmentSampleInteractive extends Fragment {
             @Override
             public void onClick(View v) {
                 recyclerTableViewAdapter.clearItems();
+            }
+        });
+
+        view.findViewById(R.id.buttonRemoveChecked).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerTableViewAdapter.removeItems(recyclerTableViewAdapter.getCheckedItems());
+            }
+        });
+
+        view.findViewById(R.id.buttonCheckEllies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(UserCheckable u : recyclerTableViewAdapter.getItems()) {
+                    u.checked = u.name.equals("Ellie");
+                }
+                // Important: If doing any changes with the objects in rows, do not forget to notify
+                // the adapter that there were changes made!
+                recyclerTableViewAdapter.notifyDataSetChanged();
             }
         });
 
