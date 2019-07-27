@@ -243,8 +243,9 @@ public class RecyclerTableViewAdapter<ItemType> extends RecyclerView.Adapter<Rec
 
     @Override
     public void removeItem(ItemType item) {
-        items.remove(item);
-        notifyItemRemoved(items.indexOf(item));
+        int itemIndex = items.indexOf(item);
+        boolean deleted = items.remove(item);
+        if (deleted) notifyItemRemoved(itemIndex);
     }
 
     @Override
@@ -255,14 +256,15 @@ public class RecyclerTableViewAdapter<ItemType> extends RecyclerView.Adapter<Rec
 
     @Override
     public void removeItems(List<ItemType> items) {
-        this.items.removeAll(items);
-        notifyDataSetChanged();
+        boolean deleted = this.items.removeAll(items);
+        if (deleted) notifyDataSetChanged();
     }
 
     @Override
     public void clearItems() {
+        int s = items.size();
         items.clear();
-        notifyDataSetChanged();
+        notifyItemRangeRemoved(0, s);
     }
 
     @Override

@@ -13,9 +13,11 @@ import androidx.fragment.app.Fragment;
 import com.mc0239.recyclertableview.RecyclerTableView;
 import com.mc0239.recyclertableview.RecyclerTableViewAdapter;
 import com.mc0239.recyclertableviewexample.R;
+import com.mc0239.recyclertableviewexample.SampleUserGenerator;
 import com.mc0239.recyclertableviewexample.rows.UserCheckable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FragmentSampleInteractive extends Fragment {
 
@@ -23,18 +25,18 @@ public class FragmentSampleInteractive extends Fragment {
     private RecyclerTableViewAdapter<UserCheckable> recyclerTableViewAdapter;
 
     private Button buttonAdd;
+    private Button buttonAddAt;
+    private Button buttonAddManyAt;
     private Button buttonRemove;
+
+    private UserCheckable lastUser;
+    private List<UserCheckable> lastUsers;
 
     public FragmentSampleInteractive() {
         // Prepare some data for the table
         ArrayList<UserCheckable> users = new ArrayList<>();
-        for(int i = 0; i < 30; i++) {
-            UserCheckable u = new UserCheckable();
-            u.checked = i % 3 == 0;
-            u.id = i;
-            u.username = "johnd";
-            u.name = "John";
-            u.surname = "Doe " + i;
+        for(int i = 0; i < 10; i++) {
+            UserCheckable u = SampleUserGenerator.generateUser();
             users.add(u);
         }
 
@@ -53,26 +55,74 @@ public class FragmentSampleInteractive extends Fragment {
         // Set adapter to RecyclerTableView
         recyclerTableView.setAdapter(recyclerTableViewAdapter);
 
-        buttonAdd = view.findViewById(R.id.buttonAdd);
-        buttonRemove = view.findViewById(R.id.buttonRemove);
-
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.buttonAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserCheckable u = new UserCheckable();
-                u.checked = false;
-                u.id = recyclerTableViewAdapter.getItemCount() + 1;
-                u.username = "johna";
-                u.name = "John";
-                u.surname = "Added";
-                recyclerTableViewAdapter.addItem(u);
+                lastUser = SampleUserGenerator.generateUser();
+                recyclerTableViewAdapter.addItem(lastUser);
             }
         });
 
-        buttonRemove.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.buttonAddAt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recyclerTableViewAdapter.removeItems(recyclerTableViewAdapter.getCheckedItems());
+                lastUser = SampleUserGenerator.generateUser();
+                recyclerTableViewAdapter.addItemAt(5, lastUser);
+            }
+        });
+
+        view.findViewById(R.id.buttonAddMore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lastUsers = new ArrayList<>(3);
+                lastUsers.add(SampleUserGenerator.generateUser());
+                lastUsers.add(SampleUserGenerator.generateUser());
+                lastUsers.add(SampleUserGenerator.generateUser());
+                recyclerTableViewAdapter.addItems(lastUsers);
+            }
+        });
+
+        view.findViewById(R.id.buttonAddMoreAt).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lastUsers = new ArrayList<>(3);
+                lastUsers.add(SampleUserGenerator.generateUser());
+                lastUsers.add(SampleUserGenerator.generateUser());
+                lastUsers.add(SampleUserGenerator.generateUser());
+                recyclerTableViewAdapter.addItemsAt(5, lastUsers);
+            }
+        });
+
+        view.findViewById(R.id.buttonRemove).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lastUser != null)
+                    recyclerTableViewAdapter.removeItem(lastUser);
+                lastUser = null;
+            }
+        });
+
+        view.findViewById(R.id.buttonRemoveAt).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (recyclerTableViewAdapter.getItemCount() > 5)
+                    recyclerTableViewAdapter.removeItemAt(5);
+            }
+        });
+
+        view.findViewById(R.id.buttonRemoveMore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lastUsers != null)
+                    recyclerTableViewAdapter.removeItems(lastUsers);
+                lastUsers = null;
+            }
+        });
+
+        view.findViewById(R.id.buttonClear).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerTableViewAdapter.clearItems();
             }
         });
 
