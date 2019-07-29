@@ -453,48 +453,4 @@ public class RecyclerTableViewAdapter<ItemType> extends RecyclerView.Adapter<Rec
 
     }
 
-    /*
-
-    //
-
-
-
-    /**
-     * Sets CheckBox fields in this adapter to given state, in rows that match the filter. Parameter
-     * filter is a SparseArray that contains columns which should be compared. Filter can contain
-     * any number of columns.
-     * <br />
-     * For example, if we want to check only a row with <i>someId</i>, filter would contain only one
-     * column:
-     * <pre>
-     * {@code
-     * SparseArray<Object> filter = new SparseArray<>(1);
-     * filter.put(R.id.textViewID, someId);
-     * }
-     * </pre>
-     * In this case, only the row with <i>someId</i> would be set as checked.
-     * @exception NotCheckableException Adapter does not have a CheckBox view ID set (setCheckable
-     * was not called upon RecyclerTableView).
-     * @param filter SparseArray that is compared to each row
-     * @param checked new state of CheckBoxes
-     *                TODO
-     */
-    /*public void setChecked(@NonNull SparseArray<Object> filter, boolean checked) {
-        if(checkboxId != 0) {
-            for (int i = 0; i < rows.size(); i++) {
-                RecyclerTableRow row = rows.get(i);
-                int fits = 0;
-                for (int j = 0; j < filter.size(); j++) {
-                    int key = filter.keyAt(j);
-                    String c1 = String.valueOf(filter.get(key));
-                    // String c2 = String.valueOf(row.get(key)); TODO
-                    // if (c1.equals(c2)) fits++;
-                }
-                if (fits == filter.size()) {
-                    setFieldValue(rowFieldMap.get(checkboxId), rows.get(i), checked);
-                }
-            }
-            notifyItemRangeChanged(0, rows.size());
-        } else throw new NotCheckableException();
-    }*/
 }
