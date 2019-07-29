@@ -1,6 +1,9 @@
 # RecyclerTableView
 
 [![](https://jitpack.io/v/mc0239/RecyclerTableView.svg)](https://jitpack.io/#mc0239/RecyclerTableView)
+![API 19+](https://img.shields.io/badge/API-19%2B-informational)
+![MIT license](https://img.shields.io/badge/License-MIT-informational)
+![Uses AndroidX](https://img.shields.io/badge/Uses-AndroidX-red)
 
 ![Sample screenshots](https://raw.githubusercontent.com/mc0239/RecyclerTableView/2.x/screenshot.jpg)
 
