@@ -41,7 +41,7 @@ public class FragmentSampleLivedata extends Fragment {
         recyclerTableView.setAdapter(recyclerTableViewAdapter);
 
         // Add LiveData observer
-        AppDatabase.getDatabase(getContext()).userDao().getAll().observe(this, new Observer<List<User>>() {
+        AppDatabase.getDatabase(getContext()).userDao().getAll().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(@Nullable List<User> users) {
                 if (users == null) return;

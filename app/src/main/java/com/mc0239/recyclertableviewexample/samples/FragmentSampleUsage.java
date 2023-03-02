@@ -25,11 +25,7 @@ public class FragmentSampleUsage extends Fragment {
         // Prepare some data for the table
         ArrayList<User> users = new ArrayList<>();
         for(int i = 0; i < 50; i++) {
-            User u = new User();
-            u.id = i;
-            u.username = "johnd";
-            u.name = "John";
-            u.surname = "Doe";
+            User u = new User(i, "johnd", "John", "Doe", null);
             users.add(u);
         }
 
